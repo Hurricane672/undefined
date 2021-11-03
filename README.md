@@ -84,3 +84,67 @@ def Xss_scan(self):
 
 >   该项目疑似python2所作若使用需转换为python3，其中多线程机制可以借用， 
 
+以sql XSS为主
+
+首先从sqli-labs入手
+
+## 2. 扫描流程
+
+### 2.0 信息提取
+
+-   服务器中间件
+-   服务器系统
+-   服务器前端框架（可选）
+-   服务器后端语言（php、python、node.js，以php为主）
+-   服务器数据库种类和版本（可用sqlmap实现）
+-   Linux / Apache / PHP7+ / Mysql5
+
+### 2.1 url爬取
+
+从首页（127.0.0.1或其他url）开始，提取get响应中的下列元素
+
+```
+<xxx href="xxx"></xxx> => (?<=href=")[^"]*(?=")
+window.location.href = "xxx" => (?<=href= ")[^"]*(?=")
+<form action="xxx" >
+<script>$.ajax({url:"signin.php",type:"GET",async:false,data:{name:nam,password:passwd},xxx})</script>
+```
+
+### 2.2 数据清洗（重中之重）
+
+-   删除url列表中无法正常访问的url
+-   将php、html、js分开，检测html中对php的请求参数，保存并准备构建payloads
+
+### 2.3 代入sqlmap
+
+将准备好的url和payload代入SQLmap
+
+## 3. sqli
+
+每个文件对应一个同名的json文件，格式如下
+
+```json
+{
+    "js":["JS/core.js","JS/query.js"],
+    "url":["./add.html","./edit.php","index.html"]
+}
+```
+
+每个文件的注入参数可能都是id=\*
+
+
+
+## DVWA
+
+-   默认账号密码：admin/password
+-   默认数据库账号密码：dvwa/root
+
+## Bwapp
+
+-   默认账号密码：bee/bug
+
+## Webug
+
+-   默认账号密码：admin/admin
+-   mysql：root/root
+

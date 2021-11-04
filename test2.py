@@ -96,7 +96,7 @@ class SQLTask:
 
 
 def open_SQLMapServer():
-    command = "python ./sqlmap/sqlmapapi.py -s &"
+    command = "python ./sqlmap/sqlmapapi.py -s > /dev/null 2>&1 &"
     system(command)
 
 

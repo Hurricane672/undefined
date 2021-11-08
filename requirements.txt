@@ -3,3 +3,6 @@ tqdm~=4.62.3
 setuptools==58.5.3
 Cython~=0.29.24
 terminaltables~=3.1.0
+scapy~=2.4.5rc1.dev142
+colorama~=0.4.4
+pproxy~=2.7.8

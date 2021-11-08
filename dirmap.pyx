@@ -7,7 +7,7 @@ global dir_list,file_list
 dir_list = []
 
 def scanDir(dir_list):
-    url0 = "http://10.122.209.76"
+    url0 = "http://192.168.1.101/"
     #found_lists = []
     #note_lists = []
     for i in tqdm.tqdm(dir_list):
@@ -21,7 +21,7 @@ def scanDir(dir_list):
             print("[!] The url "+ url +" has met the status code *"+str(r.status_code)+"*")
     return
 def main():
-    f = open("./wordlists/dir/dir4.txt")
+    f = open("./wordlists/dir/dir6.txt")
     l = f.readlines()
     processes = []
     num = int(len(l)/2)

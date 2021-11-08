@@ -3,7 +3,7 @@ import re
 
 
 def getPage(url,path):
-    open(path+)
+    open(path+"")
 
 def getJSList(url):
     response = requests.get(url)

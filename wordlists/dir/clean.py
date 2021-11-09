@@ -42,9 +42,9 @@ def clean4(l0):
 
 
 def main():
-    fi = open("./wordlists/dir/dir5.txt", "r+")
-    fi2 = open("./wordlists/dir/dirsadd.txt", "r+")
-    fo = open("wordlists/dir/dir6.txt", "w+")
+    fi = open("dir5.txt", "r+")
+    fi2 = open("dirsadd.txt", "r+")
+    fo = open("dir6.txt", "w+")
     # fo.writelines(clean4(clean3(clean2(clean1(fi.readlines())))))
     fo.writelines(clean4(fi.readlines()+fi2.readlines()))
     fi.close()

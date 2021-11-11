@@ -21,20 +21,14 @@ def scanDir(dir_list):
             print("[!] The url "+ url +" has met the status code *"+str(r.status_code)+"*")
     return
 def main():
-    f = open("./wordlists/dir/dir6.txt")
+    f = open("../wordlists/dir/dir6.txt")
     l = f.readlines()
     processes = []
     num = int(len(l)/2)
-
     t1 = Process(target=scanDir,args=[l[:num]])
     t2 = Process(target=scanDir,args=[l[num:]])
-
     processes.append(t1)
     processes.append(t2)
-
-
-
-
     for t in processes:
         t.daemon=False
         t.start()

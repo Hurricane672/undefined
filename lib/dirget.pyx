@@ -52,6 +52,6 @@ if __name__ == "__main__":
         i += 1
         print(str(i) + "/" + str(len(urls)))
 
-    file = open("urls1.json", "w+", encoding="utf-8")
+    file = open("../TEMP/urls1.json", "w+", encoding="utf-8")
     file.write(json.dumps(urls))
     # reg = re.compile('(?<=<script src=")[^"]*(?=">)')

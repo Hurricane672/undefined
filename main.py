@@ -22,11 +22,12 @@ title = '''
 def main():
     print(title)
     print("Thanks for using Andy Fun Scanner.")
-    url = input("Input the URL to scan: ")
-    url = "http://10.122.199.187"
+    # url = input("Input the URL to scan: ")
+    url = "http://10.122.199.187:82/"
     print("[+] URL " + url + " got")
     print("==============================START==============================")
-    prepare.main()
+    # prepare.main()
+    prepare.main(url)
     print("===============================END===============================")
 
 

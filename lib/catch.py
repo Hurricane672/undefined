@@ -13,9 +13,16 @@ def jsonizeCookies(cookies):
         d = {}
         return d
     else:
-        return json.loads(
-            cookies.replace("MultiDictView", "").replace("[[", "{").replace("]]", "}").replace("', '", "\":\"").replace(
-                "], [", ",").replace("'", "\""))
+        s = cookies.replace("MultiDictView", "").replace("[[", "{").replace("]]", "}").replace("', '", "\":\"").replace(
+            "], [", ",").replace("'", "\"")
+        try:
+            r = json.loads(s)
+            return r
+        except:
+            ctx.log.info("[!] JSON load ERROR: ")
+            ctx.log.info(s)
+            d = {}
+            return d
 
 
 def request(flow):
@@ -25,7 +32,7 @@ def request(flow):
     request = flow.request
     info = ctx.log.info
     url = request.url
-    if ("js" not in url) or ("jpg" not in url) or ("png" not in url) or ("css" not in url):
+    if ("js" not in url) and ("jpg" not in url) and ("png" not in url) and ("css" not in url):
         f = open("./lib/outfile.txt", "a+", encoding="utf-8")
         request_list = {"action": "request"}
         info("[<] " + request.url)  # 打印请求的url

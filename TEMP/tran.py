@@ -1,24 +1,18 @@
-import json
+from threading import Thread
+import os
+import time
+
+def start_proxy():
+    command = 'mitmdump --listen-host 127.0.0.1 -p 8081 -s catch.py'
+    os.system(command)
 
 
-def jsonizeHeaders(headers):
-    return json.loads(
-        headers["headers"][7:].replace("b'", "'").replace("), (", "???").replace(",", ":").replace("[(", "{").replace(
-            ")]", "}").replace("???", ",").replace("\"", "").replace("'", "\""))
-
-
-def jsonizeCookies(cookies):
-    if cookies=="MultiDictView[]":
-        d = {}
-        return d
-    else:
-        r = cookies.replace("MultiDictView", "").replace("[[","{").replace("]]","}").replace("', '","\":\"").replace("], [",",").replace("'","\"")
-        print(r)
-        return json.loads(r)
-
-
-f = open("outfile.txt", "r", encoding="utf-8")
-for i in f.readlines():
-    print(json.loads(i))
-# headers = jsonizeHeaders(dic)
-# print(headers)
+if __name__ == '__main__':
+    t = Thread(target=start_proxy)
+    t.daemon = True
+    t.start()
+    time.sleep(7)
+    input()
+    os.system('taskkill /F /IM "mitmdump.exe" >> output.log 2>&1')
+    os.system("del output.log")
+    print(1)

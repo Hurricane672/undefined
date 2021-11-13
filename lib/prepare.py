@@ -4,19 +4,25 @@ import json
 from terminaltables import AsciiTable
 import requests
 import re
+import time
 
 animation = "|/-\\"
 
 
 def getUrl(url, root, urls):
     reg = re.compile('(?<=href=")[^"]*(?=")')
+    reg2 = re.compile('(?<=action=")[^"]*(?=")')
     page = requests.get(url)
     response_text = page.content.decode("utf-8")
     r1 = re.findall(reg, response_text)
+    r3 = re.findall(reg2, response_text)
+    for i in r3:
+        if i != "":
+            r1.append(i)
     r2 = []
     for r in r1:
         if "http://" not in r and "https://" not in r:
-            if r[-3:] == "css" or r[0] == "#":
+            if ".css" in r or "#" in r:
                 continue
             else:
                 if (url == root) and (url + r not in r2) and (url + r not in urls):
@@ -36,13 +42,19 @@ def getUrl(url, root, urls):
     return r2
 
 
-def urlNotInParametersList(url_check, urls, parameters):
+def addParameters(url_list, parameters):
+    for i in url_list:
+        if i.split("?")[1] not in parameters:
+            parameters.append(i.split("?")[1])
+
+
+def urlNotInParametersList(url_check, urls):
     if url_check not in urls:
         for i in urls:
             if (url_check.split("?")[0] in i.split("?")[0] or i.split("?")[0] in url_check.split("?")[0]) and \
                     url_check.split("?")[1] == \
                     i.split("?")[1]:
-                parameters.append(url_check.split("?")[1])
+                # parameters.append(url_check.split("?")[1])
                 return False
         return True
     else:
@@ -69,11 +81,13 @@ def collect():
     parameters = []
     cookies = []
     headers = []
+    body = []
+    post_list = []
     file = open("./lib/outfile.txt", "r+", encoding="utf-8")
     for i in file.readlines():
         dic = json.loads(i)
         if dic["action"] == "request":
-            if "?" in dic["url"] and urlNotInParametersList(dic["url"], urls_with_params, parameters):
+            if "?" in dic["url"] and urlNotInParametersList(dic["url"], urls_with_params):
                 urls_with_params.append(dic["url"])
             elif "?" not in dic["url"] and urlNotInNoParametersList(dic["url"], urls_without_params):
                 urls_without_params.append(dic["url"])
@@ -83,12 +97,28 @@ def collect():
                 headers.append(dic["headers"])
             if dic["cookies"] not in cookies and dic["cookies"] != {}:
                 cookies.append(dic["cookies"])
-    return urls_without_params, urls_with_params, parameters, cookies, headers
+            if dic["method"] == "POST":
+                post_list.append(dic["url"])
+            try:
+                if dic["body"] not in body:
+                    body.append(dic["body"])
+            except:
+                pass
+    return urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list
 
 
 def start_proxy():
     command = 'mitmdump --listen-host 127.0.0.1 -p 8081 -s ./lib/catch.py'
     os.system(command)
+
+
+def clean(url_list):
+    r = []
+    for i in url_list:
+        if (i[-1] == "/" and i[:-1] not in url_list and i not in r and i[:-1] not in r) or (
+                i[-1] != "/" and i + "/" not in url_list and i not in r and i + "/" not in r):
+            r.append(i)
+    return r
 
 
 def dirBlast():
@@ -105,7 +135,7 @@ def main(root):
     print("[*] RECORDER started")
     print("[*] Now you can start your explore of the target URL")
     print("[*] Proxy server started")
-    # print("[*] Open the browser and shift the http proxy to 127.0.0.1:8081")
+    print("[*] Open the browser and shift the http proxy to 127.0.0.1:8081")
     # processes = []
     # t1 = Process(target=start_proxy)
     # t1.daemon = True
@@ -120,11 +150,15 @@ def main(root):
     print("[*] RECORDER has been stop")
     print("[*] The result has been written to ./lib/outfile.txt")
     print("[*] Collecting requests")
-    urls_without_params, urls_with_params, parameters, cookies, headers = collect()
+    urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list = collect()
+    addParameters(urls_with_params, parameters)
     print("[*] Follows info are found: ")
     print(AsciiTable([["URLs without parameters"], ["\n".join(urls_without_params)]]).table)
     print(AsciiTable([["URLs with parameters"], ["\n".join(urls_with_params)]]).table)
     print(AsciiTable([["Parameters"], ["\n".join(parameters)]]).table)
+    print("Body list:")
+    for i in body:
+        print(i)
     print("Cookie list:")
     for i in cookies:
         print(i)
@@ -145,6 +179,9 @@ def main(root):
             urls_without_params.append(i)
         else:
             pass
+    urls_without_params = clean(urls_without_params)
+    urls_with_params = clean(urls_with_params)
+    post_list = clean(post_list)
     print("[*] URLs without parameters is now updated to:")
     print(AsciiTable([["URLs without parameters"], ["\n".join(urls_without_params)]]).table)
     if ext != "":
@@ -167,6 +204,7 @@ def main(root):
         pass
     ##############################################################################
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CHECK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    count = 0
     for i in urls_without_params:
         print("[*] Check the url " + i)
         response = requests.get(i)
@@ -182,10 +220,11 @@ def main(root):
         if response.status_code == 404:
             print("[!] The url " + i + " has no response which will be delete")
             urls_with_params.remove(i)
+            count += 1
         else:
             print("OK")
             continue
-    print("[*] Check completed")
+    print("[*] Check completed " + str(count) + " url was deleted")
     print("[*] Prepare completed")
     # for i in range(0, len(urls_without_params)):
     #     response = requests.get(urls_without_params[i])
@@ -199,7 +238,7 @@ def main(root):
     #         del urls_with_params[i]
     #     else:
     #         continue
-    return urls_without_params, urls_with_params, parameters, cookies, headers
+    return urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list
 
 
 if __name__ == '__main__':

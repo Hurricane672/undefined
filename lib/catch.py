@@ -25,6 +25,14 @@ def jsonizeCookies(cookies):
             return d
 
 
+def jsonizeBody(body):
+    try:
+        return json.loads('{"'+'","'.join(body.split('&')).replace('=','":"')+'"}')
+    except:
+        d = {}
+        return d
+
+
 def request(flow):
     """
      {'action':str,'method':str,'url':str,'host':str,'port':str,'headers':dict,'cookies':dict(,'body':str)}
@@ -44,7 +52,7 @@ def request(flow):
         request_list["cookies"] = jsonizeCookies(str(request.cookies))
         if str(request.method) == "POST":
             try:
-                request_list["body"] = str(request.postBody)
+                request_list["body"] = jsonizeBody(str(request.text))
             except:
                 pass
         f.write(json.dumps(request_list))

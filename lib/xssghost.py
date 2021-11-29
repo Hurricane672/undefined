@@ -2,6 +2,7 @@ from selenium import webdriver
 import time
 import sys
 
+
 def phadsys():
     if sys.platform.startswith('win'):
         return "./thirdparty/phantomjs/Windows/phantomjs.exe"

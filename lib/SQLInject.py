@@ -34,8 +34,11 @@ class SQLTask:
     target = ""
     parameter = {}
 
-    def __init__(self, target, level):
+    def __init__(self, target, level, method="GET", body=None):
+        if body is None:
+            body = {}
         self.parameter = {'url': target, "level": level}
+        self.parameter = {'url': target}
         print("[*] Creating SQL Task for the target " + target)
         try:
             response = json.loads(requests.get(self.url + "task/new").text)
@@ -50,7 +53,8 @@ class SQLTask:
                 exit(2)
             else:
                 print("[#] Task added successfully")
-                print(atb([["Target", "ID", "Level"], [self.target, self.id, self.parameter["level"]]]).table)
+                print(atb([["Target", "ID"], [self.target, self.id]]).table)
+                # print(atb([["Target", "ID"], [self.target, self.id]]).table)
 
     def start(self):
         print("[*] Start scanning")
@@ -96,7 +100,7 @@ class SQLTask:
 
 
 def open_SQLMapServer():
-    command = "python ./sqlmap/sqlmapapi.py &"
+    command = "python ../sqlmap/sqlmapapi.py -s >> temp.log 2>&1"
     system(command)
 
 
@@ -104,15 +108,15 @@ def scan(url, level):
     task1 = SQLTask(url, level)
     task1.start()
     task1.status()
-    idx = 0
+    print("[*] The task is still running")
     while task1.status():
-        print("[*] The task is still running " + animation[idx % len(animation)], end="\r")
-        idx += 1
+        #print(task1.status())
         sleep(0.1)
     data = task1.data()
     # ["title","payload","where","vector","comment","templatePayload","matchRation","trueCode","falseCode"]
     data_head = ["title", "payload", "where", "vector"]
     data_list = []
+    print(data["data"][1]["value"][0]["data"].values())
     for i in data["data"][1]["value"][0]["data"].values():
         data_list.append(list(i.values())[0:4])
     # print(atb(data_list).table)
@@ -127,10 +131,9 @@ def scan(url, level):
 
 
 def main():
-    print(title)
     threads = []
-    url = u"http://10.122.209.76/Less-1?id="
-    level = u"1"
+    url = u"http://10.122.199.187:82/Less-1?id="
+    level = u"2"
     t1 = Thread(target=open_SQLMapServer)
     threads.append(t1)
     t2 = Thread(target=scan, args=(url, level))

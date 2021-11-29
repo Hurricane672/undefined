@@ -152,7 +152,7 @@ def main(root):
     print("[*] Collecting requests")
     urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list = collect()
     addParameters(urls_with_params, parameters)
-    print("[*] Follows info are found: ")
+    print("[*] Followings info are found: ")
     print(AsciiTable([["URLs without parameters"], ["\n".join(urls_without_params)]]).table)
     print(AsciiTable([["URLs with parameters"], ["\n".join(urls_with_params)]]).table)
     print(AsciiTable([["Parameters"], ["\n".join(parameters)]]).table)
@@ -226,19 +226,7 @@ def main(root):
             continue
     print("[*] Check completed " + str(count) + " url was deleted")
     print("[*] Prepare completed")
-    # for i in range(0, len(urls_without_params)):
-    #     response = requests.get(urls_without_params[i])
-    #     if response.status_code == 404:
-    #         del urls_without_params[i]
-    #     else:
-    #         continue
-    # for i in range(0, len(urls_with_params)):
-    #     response = requests.get(urls_with_params[i])
-    #     if response.status_code == 404:
-    #         del urls_with_params[i]
-    #     else:
-    #         continue
-    return urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list
+    return urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list, ext
 
 
 if __name__ == '__main__':

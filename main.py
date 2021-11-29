@@ -1,5 +1,10 @@
 import os
 from lib import prepare
+from lib import SQLInject
+from terminaltables import AsciiTable
+import json
+import time
+from lib import xssghost
 
 title = '''
     ___              __         ______
@@ -20,6 +25,12 @@ title = '''
 #     return target
 
 def main():
+    report = open("report.txt", "w+", encoding="utf-8")
+    report_title = "**REPORT**"
+    report.write(report_title)
+    report.write("\n")
+    report.write(time.asctime(time.localtime(time.time())))
+    report.write("\n")
     print(title)
     print("Thanks for using Andy Fun Scanner.")
     # url = input("Input the URL to scan: ")
@@ -27,9 +38,19 @@ def main():
     print("[+] URL " + url + " got")
     print("==============================START==============================")
     # prepare.main()
-    prepare.main(url)
+    urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list, ext = prepare.main(url)
+    print("Writing in to report.txt")
+    report.write("1. Preparation\n")
+    report.write("Followings has been detected\n")
+    report.write(AsciiTable([["URLs without parameters"], ["\n".join(urls_without_params)]]).table)
+    report.write("\n")
+    report.write(AsciiTable([["URLs with parameters"], ["\n".join(urls_with_params)]]).table)
+    report.write("\n")
+    print("done")
+    SQLInject.main(urls_without_params, urls_with_params, parameters, cookies, headers, body, post_list, ext, url)
     print("===============================END===============================")
-
+    report.close()
+    # xssghost.main()
 
 if __name__ == '__main__':
     main()

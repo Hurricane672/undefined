@@ -9,8 +9,6 @@ from selenium.webdriver.support import expected_conditions
 import time
 import sys
 
-from selenium.webdriver.common import service
-
 
 
 def aftersubmit(driver):

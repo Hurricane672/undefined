@@ -4,11 +4,22 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 import time
 import sys
 
 from selenium.webdriver.common import service
 
+
+
+def aftersubmit(driver):
+    try:
+        alert= WebDriverWait(driver,1).until(expected_conditions.alert_is_present())
+        alert.accept()
+        return True
+    except :
+        return False
 
 def phadsys():
     if sys.platform.startswith('win'):
@@ -41,15 +52,29 @@ def dvwalogin(driver):
                 inpu.send_keys(password+Keys.ENTER)
                 break
 
-def attkdvwa(driver):
+def attkdvwa(driver,securitynum=0):
+    url=driver.current_url[:-9]
+    dictionary=open("./wordlists/attack/XSS.txt",mode="r")
+    payload=dictionary.readlines()
+
     dvwalogin(driver)
     security=["Low","Medium","High","Impossible"]
-    dvwasetsecurity(driver,security[0])     
+    dvwasetsecurity(driver,security[securitynum])
+    driver.get(url+"vulnerabilities/xss_r/")
+
+    for nowpayload in payload:
+        
+        driver.find_element(By.XPATH,"//input[@type='text']").send_keys(nowpayload[:-1])
+        driver.find_element(By.XPATH,"//input[@type='submit']").click()
+        if aftersubmit(driver):
+            print(nowpayload[:-1])
+            print("发现注入点")
+            break    
 
 def driver_settings():
     chrome_opt = webdriver.ChromeOptions()
 
-    # chrome_opt.add_argument('--headless')
+    chrome_opt.add_argument('--headless')
     chrome_opt.add_argument('--disable-gpu')
     chrome_opt.add_argument(
         '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36 Edg/96.0.1054.29"')
@@ -69,7 +94,7 @@ def main():
 
     driver.get(Ourl)
     title=driver.title
-
+    
     if title.find("DVWA"):
         attkdvwa(driver)
     else:

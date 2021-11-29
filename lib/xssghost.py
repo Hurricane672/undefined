@@ -66,7 +66,7 @@ def attkdvwa(driver,securitynum=0):
         driver.find_element(By.XPATH,"//input[@type='submit']").click()
         if aftersubmit(driver):
             print(nowpayload[:-1])
-            print("发现注入点")
+            print("Injection point pound")
             break    
 
 def driver_settings():
@@ -96,7 +96,7 @@ def main():
     if title.find("DVWA"):
         attkdvwa(driver)
     else:
-        print("不是DVWA")
+        print("Not DVWA")
     # inputers = driver.find_elements(By.XPATH,"//input")
     # for inpu in inputers[:]:
     #     nowtype = inpu.get_attribute("type")

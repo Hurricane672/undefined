@@ -108,7 +108,7 @@ def main():
     if title.find("DVWA"):
         attkdvwa(driver)
     else:
-        print("不是DVWA")
+        print("Not DVWA")
     # inputers = driver.find_elements(By.XPATH,"//input")
     # for inpu in inputers[:]:
     #     nowtype = inpu.get_attribute("type")

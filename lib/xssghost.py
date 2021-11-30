@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.relative_locator import *
 import time
 import sys
 
@@ -13,7 +14,7 @@ import sys
 
 def aftersubmit(driver):
     try:
-        alert= WebDriverWait(driver,1).until(expected_conditions.alert_is_present())
+        alert= WebDriverWait(driver,0.00001).until(expected_conditions.alert_is_present())
         alert.accept()
         return True
     except :
@@ -58,16 +59,27 @@ def attkdvwa(driver,securitynum=0):
     dvwalogin(driver)
     security=["Low","Medium","High","Impossible"]
     dvwasetsecurity(driver,security[securitynum])
-    driver.get(url+"vulnerabilities/xss_r/")
+    Ourl=url+"vulnerabilities/xss_r/"
+    driver.get(Ourl)
 
     for nowpayload in payload:
         
         driver.find_element(By.XPATH,"//input[@type='text']").send_keys(nowpayload[:-1])
         driver.find_element(By.XPATH,"//input[@type='submit']").click()
         if aftersubmit(driver):
-            print(nowpayload[:-1])
-            print("发现注入点")
-            break    
+            
+            print('目标URL:  "'+Ourl+'"')
+            print("XSS类型：反射型")
+            print('PAYLOAD = "'+nowpayload[:-1]+'"')
+            try:
+                submitbtn=driver.find_element(By.XPATH,"//input[@type='submit']")
+                text = driver.find_element(with_tag_name("p").near(submitbtn)).text
+                print('注入位置在 "'+text+'" 附近')
+            except:
+                print("未找到注入点附近相关提示")
+            finally:
+                print()
+                break    
 
 def driver_settings():
     chrome_opt = webdriver.ChromeOptions()
